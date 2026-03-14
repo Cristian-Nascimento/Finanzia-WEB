@@ -7,7 +7,6 @@ export default defineConfig({
   build: {
     outDir: 'build',
   },
-  // Permite usar VITE_API_URL ou REACT_APP_BACKEND_URL (ex.: Netlify)
   envPrefix: ['VITE_', 'REACT_APP_'],
   resolve: {
     alias: {

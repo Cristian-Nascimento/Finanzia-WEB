@@ -1,10 +1,7 @@
 import axios from 'axios'
 import { useAuthStore } from '@store/authStore'
 
-const backendUrl =
-  import.meta.env.VITE_API_URL ??
-  import.meta.env.REACT_APP_BACKEND_URL ??
-  'http://localhost:4000'
+const backendUrl = import.meta.env.REACT_APP_BACKEND_URL ?? ''
 
 export const api = axios.create({
   baseURL: backendUrl,

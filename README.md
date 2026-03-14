@@ -94,7 +94,7 @@ O cliente Axios está em `src/services/api.ts`:
 - **baseURL:** `http://localhost:4000`
 - **Interceptor:** adiciona `Authorization: Bearer <token>` em todas as requisições (token do `authStore` ou `localStorage` key `finanzia_token`).
 
-Para produção, pode-se usar variável de ambiente (ex.: `VITE_API_URL`) e definir `baseURL` a partir dela.
+A URL do backend é definida pela variável de ambiente `REACT_APP_BACKEND_URL` (local: `.env`; produção: ex. Netlify).
 
 ---
 
