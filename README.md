@@ -1,6 +1,10 @@
 # Finanzia — Frontend
 
-Interface do painel financeiro Finanzia: React + TypeScript + Vite + TailwindCSS.
+![Stack](https://img.shields.io/badge/React-18-61dafb?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript)
+![Node](https://img.shields.io/badge/Node-Express-339933?logo=node.js)
+![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47a248?logo=mongodb)
+![Tailwind](https://img.shields.io/badge/Tailwind-3.4-38bdf8?logo=tailwindcss)
 
 ---
 
