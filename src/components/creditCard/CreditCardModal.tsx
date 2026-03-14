@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import type { Resolver } from "react-hook-form";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,7 +27,15 @@ const schema = z.object({
   closingDayToNextInvoice: z.boolean().default(false),
 });
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = {
+  date: string;
+  platform: string;
+  cardId?: string;
+  installmentValue: number;
+  totalInstallments: number;
+  paidInstallments: number;
+  closingDayToNextInvoice: boolean;
+};
 
 type CreditCardModalProps = {
   open: boolean;
@@ -52,7 +61,7 @@ export function CreditCardModal({
     watch,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as Resolver<FormValues>,
     defaultValues: {
       date: new Date().toISOString().slice(0, 10),
       platform: "",
@@ -130,7 +139,7 @@ export function CreditCardModal({
     },
   });
 
-  const onSubmit = (values: FormValues) => {
+  const onSubmit = (values: FormValues): void => {
     if (purchaseToEdit) {
       updateMutation.mutate({ id: purchaseToEdit._id, data: values });
     } else {

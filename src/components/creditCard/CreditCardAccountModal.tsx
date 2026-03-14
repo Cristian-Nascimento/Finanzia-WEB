@@ -9,7 +9,7 @@ import type { CreditCardAccount } from "@typings/creditCard";
 const schema = z.object({
   name: z.string().min(2, "Informe o nome do cartão"),
   closingDay: z
-    .number({ invalid_type_error: "Informe um número entre 1 e 31" })
+    .number({ message: "Informe um número entre 1 e 31" })
     .int("Dia deve ser inteiro")
     .min(1, "Mínimo dia 1")
     .max(31, "Máximo dia 31"),
