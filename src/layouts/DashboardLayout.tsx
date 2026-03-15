@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
-import { Menu, Plus, LogOut, User, ChevronDown, LayoutDashboard, ArrowLeftRight, Tags, UserCircle, TrendingUp, Moon, Sun, CreditCard, PieChart } from 'lucide-react'
+import { Menu, Plus, LogOut, User, ChevronDown, LayoutDashboard, ArrowLeftRight, Tags, UserCircle, TrendingUp, Moon, Sun, CreditCard, Wallet, PieChart } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useRef, useEffect } from 'react'
 import { useAuthStore } from '@store/authStore'
@@ -13,6 +13,7 @@ const navItems: { to: string; label: string; icon: typeof LayoutDashboard }[] = 
   { to: '/transactions', label: 'Transações', icon: ArrowLeftRight },
   { to: '/grouped-view', label: 'Visão agrupada', icon: PieChart },
   { to: '/credit-card', label: 'Cartão de crédito', icon: CreditCard },
+  { to: '/debit-card', label: 'Cartão de débito', icon: Wallet },
   { to: '/investments', label: 'Investimentos', icon: TrendingUp },
   { to: '/categories', label: 'Categorias', icon: Tags },
 ]
@@ -55,7 +56,7 @@ export function DashboardLayout() {
       .toUpperCase() ?? 'US'
 
   return (
-    <div className="h-screen overflow-hidden bg-[var(--color-bg-soft)] text-slate-900 dark:text-slate-100 flex">
+    <div className="h-full min-h-screen min-h-[100dvh] overflow-hidden bg-[var(--color-bg-soft)] text-slate-900 dark:text-slate-100 flex">
       {/* Overlay mobile */}
       <div
         className="fixed inset-0 z-30 bg-slate-900/50 backdrop-blur-sm lg:hidden"
@@ -158,14 +159,14 @@ export function DashboardLayout() {
         </div>
       </aside>
 
-      {/* Conteúdo principal */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Conteúdo principal: min-h-0 permite o flex encolher e o scroll interno funcionar em mobile */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-0">
         <TransactionModal />
         <CategoriesSetupModal
           open={showCategoriesSetup}
           onClose={() => setShowCategoriesSetup(false)}
         />
-        <header className="sticky top-0 z-20 border-b border-slate-200/70 dark:border-slate-600/70 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-xl">
+        <header className="sticky top-0 z-20 shrink-0 border-b border-slate-200/70 dark:border-slate-600/70 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-xl pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
           <div className="flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8 gap-3">
             <div className="flex items-center gap-2">
               <button
@@ -254,9 +255,14 @@ export function DashboardLayout() {
           </div>
         </header>
 
-        {/* Área de conteúdo: ocupa a altura inteira e faz o scroll vertical interno, não na página */}
-        <main className="flex-1 w-full min-w-0 pt-4 lg:pt-6 pb-0 flex justify-center overflow-hidden">
-          <div className="w-full max-w-[94vw] mx-auto px-4 sm:px-6 lg:px-8 h-full overflow-y-auto pb-6 lg:pb-10">
+        {/* Área de conteúdo: min-h-0 + overflow-y-auto para scroll correto em mobile */}
+        <main className="flex-1 w-full min-w-0 min-h-0 pt-4 lg:pt-6 pb-0 flex justify-center overflow-hidden">
+          <div
+            className="w-full max-w-[94vw] mx-auto px-4 sm:px-6 lg:px-8 min-h-0 flex-1 overflow-y-auto overflow-x-hidden lg:pb-10"
+            style={{
+              paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom, 0px))',
+            }}
+          >
             <Outlet />
           </div>
         </main>

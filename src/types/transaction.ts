@@ -10,6 +10,8 @@ export type Transaction = {
   isRecurring?: boolean
   notes?: string
   creditCardPurchaseId?: string
+  /** Conta de cartão de crédito quando paymentMethod é 'credit'. */
+  creditCardAccountId?: string
   installmentCurrent?: number
   installmentTotal?: number
   recurringGroupId?: string

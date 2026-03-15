@@ -9,6 +9,7 @@ import { InvestmentsPage } from '@pages/investments/InvestmentsPage'
 import { CategoriesPage } from '@pages/categories/CategoriesPage'
 import { ProfilePage } from '@pages/profile/ProfilePage'
 import { CreditCardPage } from '@pages/creditCard/CreditCardPage'
+import { DebitCardPage } from '@pages/debitCard/DebitCardPage'
 import { GroupedViewPage } from '@pages/groupedView/GroupedViewPage'
 import { ProtectedRoute } from '@components/auth/ProtectedRoute'
 
@@ -32,6 +33,7 @@ export function App() {
         <Route path="/investments" element={<InvestmentsPage />} />
         <Route path="/categories" element={<CategoriesPage />} />
         <Route path="/credit-card" element={<CreditCardPage />} />
+        <Route path="/debit-card" element={<DebitCardPage />} />
         <Route path="/grouped-view" element={<GroupedViewPage />} />
         <Route path="/profile" element={<ProfilePage />} />
       </Route>

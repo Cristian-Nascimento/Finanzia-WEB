@@ -7,6 +7,7 @@ import { api } from '@services/api'
 import { useUiStore } from '@store/uiStore'
 import { formatBRL, parseBRL } from '@utils/currency'
 import type { Category } from '@typings/category'
+import type { CreditCardAccount } from '@typings/creditCard'
 
 const schema = z.object({
   title: z.string().min(2, 'Informe um título'),
@@ -14,14 +15,24 @@ const schema = z.object({
   amount: z.number().positive('Informe um valor maior que zero'),
   categoryId: z.string().optional(),
   paymentMethod: z.string().optional(),
+  creditCardAccountId: z.string().optional(),
   date: z.string().min(1, 'Informe a data'),
   isRecurring: z.boolean().optional(),
   notes: z.string().optional(),
-  installmentCurrent: z.number().int().min(1).max(120).optional(),
-  installmentTotal: z.number().int().min(1).max(120).optional(),
+  installmentCurrent: z
+    .union([z.number().int().min(1).max(120), z.nan(), z.literal(0), z.undefined()])
+    .transform((v) => (v === undefined || Number.isNaN(v) || v === 0 ? undefined : v))
+    .optional(),
+  installmentTotal: z
+    .union([z.number().int().min(1).max(120), z.nan(), z.literal(0), z.undefined()])
+    .transform((v) => (v === undefined || Number.isNaN(v) || v === 0 ? undefined : v))
+    .optional(),
 })
 
 type FormValues = z.infer<typeof schema>
+
+/** Nomes que são forma de pagamento, não categoria — não devem aparecer no select de categoria. */
+const PAYMENT_AS_CATEGORY_NAMES = ['Cartão de crédito', 'Cartão de débito']
 
 export function TransactionModal() {
   const {
@@ -29,6 +40,7 @@ export function TransactionModal() {
     transactionModalMode,
     transactionToEdit,
     initialTransactionType,
+    initialPaymentMethod,
     closeTransactionModal,
   } = useUiStore()
 
@@ -42,12 +54,22 @@ export function TransactionModal() {
     },
   })
 
+  const { data: cardAccounts = [] } = useQuery<CreditCardAccount[]>({
+    queryKey: ['credit-card-accounts'],
+    queryFn: async () => {
+      const res = await api.get('/credit-card-accounts')
+      return res.data
+    },
+    enabled: isTransactionModalOpen,
+  })
+
   const {
     register,
     handleSubmit,
     reset,
     control,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -66,6 +88,7 @@ export function TransactionModal() {
         amount: transactionToEdit.amount,
         categoryId: transactionToEdit.categoryId,
         paymentMethod: transactionToEdit.paymentMethod,
+        creditCardAccountId: transactionToEdit.creditCardAccountId ?? '',
         date: transactionToEdit.date.slice(0, 10),
         isRecurring: transactionToEdit.isRecurring ?? false,
         notes: transactionToEdit.notes,
@@ -79,7 +102,8 @@ export function TransactionModal() {
         type: defaultType,
         amount: 0,
         categoryId: undefined,
-        paymentMethod: '',
+        paymentMethod: initialPaymentMethod ?? '',
+        creditCardAccountId: '',
         date: new Date().toISOString().slice(0, 10),
         isRecurring: false,
         notes: '',
@@ -87,7 +111,32 @@ export function TransactionModal() {
         installmentTotal: undefined,
       })
     }
-  }, [isTransactionModalOpen, transactionModalMode, transactionToEdit, initialTransactionType, reset])
+  }, [isTransactionModalOpen, transactionModalMode, transactionToEdit, initialTransactionType, initialPaymentMethod, reset])
+
+  const transactionType = watch('type')
+  const currentCategoryId = watch('categoryId')
+  const currentPaymentMethod = watch('paymentMethod')
+  const isRecurringChecked = watch('isRecurring')
+  useEffect(() => {
+    if (currentPaymentMethod !== 'credit') {
+      setValue('creditCardAccountId', '')
+    }
+  }, [currentPaymentMethod, setValue])
+
+  useEffect(() => {
+    if (isRecurringChecked) {
+      setValue('installmentCurrent', undefined)
+      setValue('installmentTotal', undefined)
+    }
+  }, [isRecurringChecked, setValue])
+
+  useEffect(() => {
+    if (!isTransactionModalOpen || !categories?.length || !currentCategoryId) return
+    const catsForType = categories.filter((c) => c.type === transactionType)
+    if (!catsForType.some((c) => c._id === currentCategoryId)) {
+      setValue('categoryId', '')
+    }
+  }, [transactionType, isTransactionModalOpen, categories, currentCategoryId, setValue])
 
   const createMutation = useMutation({
     mutationFn: async (data: FormValues) => {
@@ -114,20 +163,33 @@ export function TransactionModal() {
   })
 
   const onSubmit = (values: FormValues) => {
+    const data = { ...values }
+    const keepCard =
+      data.paymentMethod === 'credit' && data.creditCardAccountId
+    if (!keepCard) data.creditCardAccountId = undefined
     if (transactionModalMode === 'edit' && transactionToEdit) {
+      const updatePayload = { ...data }
+      if (!keepCard) (updatePayload as { creditCardAccountId?: string | null }).creditCardAccountId = null
       return updateMutation.mutate({
         id: transactionToEdit._id,
-        data: values,
+        data: updatePayload as FormValues,
       })
     }
-    return createMutation.mutate(values)
+    return createMutation.mutate(data)
   }
 
-  const transactionType = watch('type')
   const paymentMethod = watch('paymentMethod')
   const isExpense = transactionType === 'expense'
   const isCredit = paymentMethod === 'credit'
-  const showInstallmentFields = isExpense && isCredit
+  const showInstallmentFields = isExpense && isCredit && !isRecurringChecked
+
+  /** Categorias filtradas pelo tipo e excluindo formas de pagamento (não são categorias). */
+  const categoriesByType =
+    categories?.filter(
+      (cat) =>
+        cat.type === transactionType &&
+        !PAYMENT_AS_CATEGORY_NAMES.includes(cat.name),
+    ) ?? []
 
   if (!isTransactionModalOpen) return null
 
@@ -227,7 +289,7 @@ export function TransactionModal() {
                 {...register('categoryId')}
               >
                 <option value="">Sem categoria</option>
-                {categories?.map((cat) => (
+                {categoriesByType.map((cat) => (
                   <option key={cat._id} value={cat._id}>
                     {cat.name}
                   </option>
@@ -251,6 +313,31 @@ export function TransactionModal() {
               </select>
             </div>
           </div>
+
+          {paymentMethod === 'credit' && (
+            <div>
+              <label className="block text-[11px] mb-1 text-slate-600 dark:text-slate-300">
+                Cartão
+              </label>
+              <select
+                className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 px-2.5 py-1.5 text-[11px] text-slate-900 dark:text-slate-100 outline-none focus:border-indigo-400 dark:focus:bg-slate-600"
+                {...register('creditCardAccountId')}
+              >
+                <option value="">Selecione o cartão</option>
+                {cardAccounts.map((card) => (
+                  <option key={card._id} value={card._id}>
+                    {card.name}
+                    {card.closingDay ? ` (fecha dia ${card.closingDay})` : ''}
+                  </option>
+                ))}
+              </select>
+              {cardAccounts.length === 0 && (
+                <p className="mt-0.5 text-[10px] text-slate-500 dark:text-slate-400">
+                  Cadastre cartões em Cartão de crédito → Gerenciar cartões.
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="grid gap-2 grid-cols-2">
             <div>

@@ -11,7 +11,6 @@ const DEFAULT_CATEGORIES: { name: string; type: 'income' | 'expense' }[] = [
   { name: 'Internet', type: 'expense' },
   { name: 'Água', type: 'expense' },
   { name: 'Energia', type: 'expense' },
-  { name: 'Cartão de crédito', type: 'expense' },
   { name: 'Saúde', type: 'expense' },
   { name: 'Educação', type: 'expense' },
   { name: 'Compras', type: 'expense' },
