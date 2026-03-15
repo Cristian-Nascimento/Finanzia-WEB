@@ -108,3 +108,12 @@ body {
   @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium;
 }
 
+/* Área de scroll principal: habilita rolagem em mobile (iOS/Android) */
+.main-scroll-area {
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior-y: contain;
+}
+

@@ -56,7 +56,7 @@ export function DashboardLayout() {
       .toUpperCase() ?? 'US'
 
   return (
-    <div className="h-full min-h-screen min-h-[100dvh] overflow-hidden bg-[var(--color-bg-soft)] text-slate-900 dark:text-slate-100 flex">
+    <div className="flex h-full min-h-0 overflow-hidden bg-[var(--color-bg-soft)] text-slate-900 dark:text-slate-100" style={{ height: '100dvh', minHeight: '100vh' }}>
       {/* Overlay mobile */}
       <div
         className="fixed inset-0 z-30 bg-slate-900/50 backdrop-blur-sm lg:hidden"
@@ -255,10 +255,10 @@ export function DashboardLayout() {
           </div>
         </header>
 
-        {/* Área de conteúdo: min-h-0 + overflow-y-auto para scroll correto em mobile */}
-        <main className="flex-1 w-full min-w-0 min-h-0 pt-4 lg:pt-6 pb-0 flex justify-center overflow-hidden">
+        {/* Área de conteúdo: coluna flex com altura limitada para o scroll funcionar */}
+        <main className="flex-1 w-full min-w-0 min-h-0 flex flex-col pt-4 lg:pt-6 overflow-hidden">
           <div
-            className="w-full max-w-[94vw] mx-auto px-4 sm:px-6 lg:px-8 min-h-0 flex-1 overflow-y-auto overflow-x-hidden lg:pb-10"
+            className="main-scroll-area flex-1 w-full min-h-0 max-w-[94vw] mx-auto px-4 sm:px-6 lg:px-8 lg:pb-10"
             style={{
               paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom, 0px))',
             }}
