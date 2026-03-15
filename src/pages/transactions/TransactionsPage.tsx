@@ -5,7 +5,7 @@ import type { Transaction } from "@typings/transaction";
 import type { Category } from "@typings/category";
 import { useUiStore } from "@store/uiStore";
 import { Pencil, Trash2, ArrowDownRight, ArrowUpRight } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, CartesianGrid } from "recharts";
 import { ConfirmModal } from "@components/ui/ConfirmModal";
 import {
@@ -254,109 +254,152 @@ export function TransactionsPage() {
       </div>
 
       {!isLoading && transactions && transactions.length > 0 && (
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="rounded-2xl border border-slate-200/70 dark:border-slate-600/70 bg-white dark:bg-slate-800/50 p-4 shadow-sm">
-            <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400 text-center mb-1">
-              Receitas por categoria
-            </p>
-            {totalIncome > 0 && (
-              <p className="text-xs font-medium text-emerald-700/80 dark:text-emerald-300 text-center mb-2">
-                Total:{" "}
-                <span>
-                  R$
-                  {" "}
-                  {totalIncome.toLocaleString("pt-BR", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </span>
-              </p>
+        <div className="min-h-[280px] relative">
+          <AnimatePresence mode="wait">
+            {typeFilter === "all" && (
+              <motion.div
+                key="all"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+                className="grid gap-4 md:grid-cols-2"
+              >
+                <motion.div
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.25, delay: 0.05 }}
+                  className="rounded-2xl border border-slate-200/70 dark:border-slate-600/70 bg-white dark:bg-slate-800/50 p-4 shadow-sm"
+                >
+                  <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400 text-center mb-1">
+                    Receitas por categoria
+                  </p>
+                  {totalIncome > 0 && (
+                    <p className="text-xs font-medium text-emerald-700/80 dark:text-emerald-300 text-center mb-2">
+                      Total: R$ {totalIncome.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                  )}
+                  <div className="h-48 md:h-56">
+                    {incomeByCategory.length > 0 ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={incomeByCategory} layout="vertical" margin={{ left: 4, right: 8 }}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-slate-600" />
+                          <XAxis type="number" tickFormatter={formatAxis} tick={{ fontSize: 10 }} />
+                          <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 10 }} />
+                          <Bar dataKey="total" fill="#22c55e" radius={[0, 4, 4, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center h-full">
+                        Nenhuma receita no período
+                      </p>
+                    )}
+                  </div>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: 12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.25, delay: 0.1 }}
+                  className="rounded-2xl border border-slate-200/70 dark:border-slate-600/70 bg-white dark:bg-slate-800/50 p-4 shadow-sm"
+                >
+                  <p className="text-sm font-semibold text-rose-700 dark:text-rose-400 text-center mb-1">
+                    Despesas por categoria
+                  </p>
+                  {totalExpense > 0 && (
+                    <p className="text-xs font-medium text-rose-700/80 dark:text-rose-300 text-center mb-2">
+                      Total: R$ {totalExpense.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                  )}
+                  <div className="h-48 md:h-56">
+                    {expenseByCategory.length > 0 ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={expenseByCategory} layout="vertical" margin={{ left: 4, right: 8 }}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-slate-600" />
+                          <XAxis type="number" tickFormatter={formatAxis} tick={{ fontSize: 10 }} />
+                          <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 10 }} />
+                          <Bar dataKey="total" fill="#e11d48" radius={[0, 4, 4, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center h-full">
+                        Nenhuma despesa no período
+                      </p>
+                    )}
+                  </div>
+                </motion.div>
+              </motion.div>
             )}
-            <div className="h-48 md:h-56">
-              {incomeByCategory.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={incomeByCategory}
-                    layout="vertical"
-                    margin={{ left: 4, right: 8 }}
-                  >
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="#e5e7eb"
-                      className="dark:stroke-slate-600"
-                    />
-                    <XAxis
-                      type="number"
-                      tickFormatter={formatAxis}
-                      tick={{ fontSize: 10 }}
-                    />
-                    <YAxis
-                      type="category"
-                      dataKey="name"
-                      width={80}
-                      tick={{ fontSize: 10 }}
-                    />
-                    <Bar dataKey="total" fill="#22c55e" radius={[0, 4, 4, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center h-full">
-                  Nenhuma receita no período
+            {typeFilter === "income" && (
+              <motion.div
+                key="income"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+                className="rounded-2xl border border-slate-200/70 dark:border-slate-600/70 bg-white dark:bg-slate-800/50 p-4 shadow-sm"
+              >
+                <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400 text-center mb-1">
+                  Receitas por categoria
                 </p>
-              )}
-            </div>
-          </div>
-          <div className="rounded-2xl border border-slate-200/70 dark:border-slate-600/70 bg-white dark:bg-slate-800/50 p-4 shadow-sm">
-            <p className="text-sm font-semibold text-rose-700 dark:text-rose-400 text-center mb-1">
-              Despesas por categoria
-            </p>
-            {totalExpense > 0 && (
-              <p className="text-xs font-medium text-rose-700/80 dark:text-rose-300 text-center mb-2">
-                Total:{" "}
-                <span>
-                  R$
-                  {" "}
-                  {totalExpense.toLocaleString("pt-BR", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </span>
-              </p>
+                {totalIncome > 0 && (
+                  <p className="text-xs font-medium text-emerald-700/80 dark:text-emerald-300 text-center mb-2">
+                    Total: R$ {totalIncome.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                )}
+                <div className="h-48 md:h-56">
+                  {incomeByCategory.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={incomeByCategory} layout="vertical" margin={{ left: 4, right: 8 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-slate-600" />
+                        <XAxis type="number" tickFormatter={formatAxis} tick={{ fontSize: 10 }} />
+                        <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 10 }} />
+                        <Bar dataKey="total" fill="#22c55e" radius={[0, 4, 4, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center h-full">
+                      Nenhuma receita no período
+                    </p>
+                  )}
+                </div>
+              </motion.div>
             )}
-            <div className="h-48 md:h-56">
-              {expenseByCategory.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={expenseByCategory}
-                    layout="vertical"
-                    margin={{ left: 4, right: 8 }}
-                  >
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="#e5e7eb"
-                      className="dark:stroke-slate-600"
-                    />
-                    <XAxis
-                      type="number"
-                      tickFormatter={formatAxis}
-                      tick={{ fontSize: 10 }}
-                    />
-                    <YAxis
-                      type="category"
-                      dataKey="name"
-                      width={80}
-                      tick={{ fontSize: 10 }}
-                    />
-                    <Bar dataKey="total" fill="#e11d48" radius={[0, 4, 4, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center h-full">
-                  Nenhuma despesa no período
+            {typeFilter === "expense" && (
+              <motion.div
+                key="expense"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+                className="rounded-2xl border border-slate-200/70 dark:border-slate-600/70 bg-white dark:bg-slate-800/50 p-4 shadow-sm"
+              >
+                <p className="text-sm font-semibold text-rose-700 dark:text-rose-400 text-center mb-1">
+                  Despesas por categoria
                 </p>
-              )}
-            </div>
-          </div>
+                {totalExpense > 0 && (
+                  <p className="text-xs font-medium text-rose-700/80 dark:text-rose-300 text-center mb-2">
+                    Total: R$ {totalExpense.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                )}
+                <div className="h-48 md:h-56">
+                  {expenseByCategory.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={expenseByCategory} layout="vertical" margin={{ left: 4, right: 8 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-slate-600" />
+                        <XAxis type="number" tickFormatter={formatAxis} tick={{ fontSize: 10 }} />
+                        <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 10 }} />
+                        <Bar dataKey="total" fill="#e11d48" radius={[0, 4, 4, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center h-full">
+                      Nenhuma despesa no período
+                    </p>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       )}
 
