@@ -1,10 +1,11 @@
-import { useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { api } from '@services/api'
 import { useAuthStore } from '@store/authStore'
+import { ConfirmModal } from '@components/ui/ConfirmModal'
 type MeResponse = {
   user: {
     id: string
@@ -28,6 +29,7 @@ type ProfileFormValues = { name: string; avatarUrl: string }
 export function ProfilePage() {
   const queryClient = useQueryClient()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [deleteDataModalOpen, setDeleteDataModalOpen] = useState(false)
   const authUser = useAuthStore((s) => s.user)
   const updateUser = useAuthStore((s) => s.updateUser)
 
@@ -105,6 +107,25 @@ export function ProfilePage() {
       uploadAvatarMutation.mutate(file)
     }
     e.target.value = ''
+  }
+
+  const deleteAllDataMutation = useMutation({
+    mutationFn: () => api.delete('/auth/me/data'),
+    onSuccess: () => {
+      setDeleteDataModalOpen(false)
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['categories'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard-summary'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard-charts'] })
+      queryClient.invalidateQueries({ queryKey: ['grouped-view'] })
+      queryClient.invalidateQueries({ queryKey: ['credit-card'] })
+      queryClient.invalidateQueries({ queryKey: ['investments'] })
+      alert('Dados removidos com sucesso.')
+    },
+  })
+
+  const handleConfirmDeleteAllData = () => {
+    deleteAllDataMutation.mutate()
   }
 
   if (!user) return null
@@ -232,6 +253,34 @@ export function ProfilePage() {
         <p className="text-xs text-slate-500 dark:text-slate-400">E-mail (não editável)</p>
         <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{user.email}</p>
       </div>
+
+      <div className="glass-card p-4 md:p-5 border border-rose-200 dark:border-rose-800/50">
+        <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+          Zona de perigo
+        </h3>
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          Excluir todos os dados remove transações, categorias, investimentos e cartões de crédito. Sua conta (e-mail e senha) permanece.
+        </p>
+        <button
+          type="button"
+          onClick={() => setDeleteDataModalOpen(true)}
+          className="mt-3 rounded-xl border border-rose-300 dark:border-rose-700 bg-rose-50 dark:bg-rose-900/20 px-4 py-2 text-sm font-medium text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-colors"
+        >
+          Excluir todos os dados
+        </button>
+      </div>
+
+      <ConfirmModal
+        open={deleteDataModalOpen}
+        onClose={() => setDeleteDataModalOpen(false)}
+        onConfirm={handleConfirmDeleteAllData}
+        title="Excluir todos os dados?"
+        message="Isso removerá permanentemente todas as suas transações, categorias, investimentos e dados de cartão de crédito. Sua conta (login) não será removida. Esta ação não pode ser desfeita."
+        confirmLabel="Excluir tudo"
+        cancelLabel="Cancelar"
+        variant="danger"
+        isLoading={deleteAllDataMutation.isPending}
+      />
     </div>
   )
 }

@@ -14,16 +14,24 @@ type PeriodFilterProps = {
 }
 
 const currentYear = new Date().getFullYear()
+const currentMonth = new Date().getMonth() + 1
 const years = [currentYear, currentYear - 1, currentYear - 2]
 
 export function PeriodFilter({ value, onChange, label, className = '' }: PeriodFilterProps) {
   const displayLabel = label ?? 'Período'
+  const isCurrentMonth =
+    !value.showAll && value.month === currentMonth && value.year === currentYear
+
   const handleShowAll = () => {
     onChange({ ...value, showAll: true })
   }
 
   const handlePeriod = (month: number, year: number) => {
     onChange({ showAll: false, month, year })
+  }
+
+  const handleCurrentMonth = () => {
+    onChange({ showAll: false, month: currentMonth, year: currentYear })
   }
 
   return (
@@ -43,6 +51,7 @@ export function PeriodFilter({ value, onChange, label, className = '' }: PeriodF
       <select
         value={value.month}
         onChange={(e) => handlePeriod(Number(e.target.value), value.year)}
+        disabled={value.showAll}
         className="rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-1.5 text-xs text-slate-700 dark:text-slate-200 disabled:opacity-50"
       >
         {MONTHS.map((m, i) => (
@@ -54,6 +63,7 @@ export function PeriodFilter({ value, onChange, label, className = '' }: PeriodF
       <select
         value={value.year}
         onChange={(e) => handlePeriod(value.month, Number(e.target.value))}
+        disabled={value.showAll}
         className="rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-1.5 text-xs text-slate-700 dark:text-slate-200 disabled:opacity-50"
       >
         {years.map((y) => (
@@ -62,6 +72,17 @@ export function PeriodFilter({ value, onChange, label, className = '' }: PeriodF
           </option>
         ))}
       </select>
+      <button
+        type="button"
+        onClick={handleCurrentMonth}
+        className={`rounded-xl px-3 py-1.5 text-xs font-medium transition-colors min-w-[7rem] ${
+          isCurrentMonth
+            ? 'bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200'
+            : 'border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600'
+        }`}
+      >
+        Mês atual
+      </button>
     </div>
   )
 }

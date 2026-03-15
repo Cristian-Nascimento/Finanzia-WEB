@@ -30,7 +30,13 @@ export function LoginPage() {
       const { user, token } = response.data
       setAuth({ user, token })
       const from = (location.state as any)?.from?.pathname || '/'
-      navigate(from, { replace: true })
+      const categoriesRes = await api.get('/categories')
+      const hasCategories = Array.isArray(categoriesRes.data) && categoriesRes.data.length > 0
+      if (!hasCategories) {
+        navigate(from, { replace: true, state: { openCategoriesModal: true } })
+      } else {
+        navigate(from, { replace: true })
+      }
     } catch (error: any) {
       const message =
         error?.response?.data?.message || 'Erro ao fazer login. Tente novamente.'

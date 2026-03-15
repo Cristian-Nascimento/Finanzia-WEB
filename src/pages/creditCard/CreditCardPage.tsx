@@ -14,6 +14,10 @@ import { formatDateShort } from "@utils/date";
 import { Pencil, Trash2, Plus, CreditCard } from "lucide-react";
 import { motion } from "framer-motion";
 import { ConfirmModal } from "@components/ui/ConfirmModal";
+import {
+  PeriodFilter,
+  type PeriodFilterValue,
+} from "@components/ui/PeriodFilter";
 import { CreditCardModal } from "@components/creditCard/CreditCardModal";
 import { CreditCardAccountModal } from "@components/creditCard/CreditCardAccountModal";
 import { ImportCreditCardModal } from "@components/creditCard/ImportCreditCardModal";
@@ -120,6 +124,12 @@ export function CreditCardPage() {
   const [sort, setSort] = useState<CreditCardSort>("date-desc");
   const [cardModalOpen, setCardModalOpen] = useState(false);
   const [cardFilter, setCardFilter] = useState<string>("");
+  const now = new Date();
+  const [period, setPeriod] = useState<PeriodFilterValue>({
+    showAll: false,
+    month: now.getMonth() + 1,
+    year: now.getFullYear(),
+  });
 
   const { data: purchases = [], isLoading } = useQuery<CreditCardPurchase[]>({
     queryKey: ["credit-card"],
@@ -137,14 +147,26 @@ export function CreditCardPage() {
     },
   });
 
-  const filteredPurchases = useMemo(() => {
+  /** Filtra por período: quando não é "Todos", apenas compras cuja data está no mês/ano selecionado. */
+  const periodFilteredPurchases = useMemo(() => {
     if (!purchases.length) return [];
-    if (!cardFilter) return purchases;
+    if (period.showAll) return purchases;
+    return purchases.filter((p) => {
+      const d = new Date(p.date);
+      const y = d.getUTCFullYear();
+      const m = d.getUTCMonth() + 1;
+      return y === period.year && m === period.month;
+    });
+  }, [purchases, period]);
+
+  const filteredPurchases = useMemo(() => {
+    if (!periodFilteredPurchases.length) return [];
+    if (!cardFilter) return periodFilteredPurchases;
     if (cardFilter === "__no_card__") {
-      return purchases.filter((p) => !p.cardId);
+      return periodFilteredPurchases.filter((p) => !p.cardId);
     }
-    return purchases.filter((p) => p.cardId === cardFilter);
-  }, [purchases, cardFilter]);
+    return periodFilteredPurchases.filter((p) => p.cardId === cardFilter);
+  }, [periodFilteredPurchases, cardFilter]);
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/credit-card/${id}`),
@@ -265,6 +287,11 @@ export function CreditCardPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
+          <PeriodFilter
+            value={period}
+            onChange={setPeriod}
+            className="w-full sm:w-auto"
+          />
           <button
             type="button"
             onClick={() => setImportModalOpen(true)}

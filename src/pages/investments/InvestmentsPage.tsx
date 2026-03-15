@@ -18,7 +18,7 @@ const currentMonth = new Date().getMonth() + 1;
 export function InvestmentsPage() {
   const queryClient = useQueryClient();
   const [period, setPeriod] = useState<PeriodFilterValue>({
-    showAll: true,
+    showAll: false,
     month: currentMonth,
     year: currentYear,
   });

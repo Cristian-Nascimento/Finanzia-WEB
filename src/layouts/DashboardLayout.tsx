@@ -1,15 +1,17 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
-import { Menu, Plus, LogOut, User, ChevronDown, LayoutDashboard, ArrowLeftRight, Tags, UserCircle, TrendingUp, Moon, Sun, CreditCard } from 'lucide-react'
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
+import { Menu, Plus, LogOut, User, ChevronDown, LayoutDashboard, ArrowLeftRight, Tags, UserCircle, TrendingUp, Moon, Sun, CreditCard, PieChart } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useRef, useEffect } from 'react'
 import { useAuthStore } from '@store/authStore'
 import { useUiStore } from '@store/uiStore'
 import { useThemeStore } from '@store/themeStore'
 import { TransactionModal } from '@components/transactions/TransactionModal'
+import { CategoriesSetupModal } from '@components/categories/CategoriesSetupModal'
 
 const navItems: { to: string; label: string; icon: typeof LayoutDashboard }[] = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/transactions', label: 'Transações', icon: ArrowLeftRight },
+  { to: '/grouped-view', label: 'Visão agrupada', icon: PieChart },
   { to: '/credit-card', label: 'Cartão de crédito', icon: CreditCard },
   { to: '/investments', label: 'Investimentos', icon: TrendingUp },
   { to: '/categories', label: 'Categorias', icon: Tags },
@@ -17,12 +19,22 @@ const navItems: { to: string; label: string; icon: typeof LayoutDashboard }[] = 
 
 export function DashboardLayout() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [sidebarOpenMobile, setSidebarOpenMobile] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [showCategoriesSetup, setShowCategoriesSetup] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
   const { user, clearAuth } = useAuthStore()
   const openTransactionModal = useUiStore((s) => s.openTransactionModal)
   const { theme, toggleTheme } = useThemeStore()
+
+  useEffect(() => {
+    const state = location.state as { openCategoriesModal?: boolean } | null
+    if (state?.openCategoriesModal) {
+      setShowCategoriesSetup(true)
+      navigate(location.pathname, { replace: true, state: {} })
+    }
+  }, [location.state, location.pathname, navigate])
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -149,6 +161,10 @@ export function DashboardLayout() {
       {/* Conteúdo principal */}
       <div className="flex-1 flex flex-col min-w-0">
         <TransactionModal />
+        <CategoriesSetupModal
+          open={showCategoriesSetup}
+          onClose={() => setShowCategoriesSetup(false)}
+        />
         <header className="sticky top-0 z-20 border-b border-slate-200/70 dark:border-slate-600/70 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-xl">
           <div className="flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8 gap-3">
             <div className="flex items-center gap-2">
