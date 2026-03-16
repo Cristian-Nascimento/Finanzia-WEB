@@ -452,11 +452,12 @@ export function CreditCardPage() {
           <div className="min-w-0 flex-1 rounded-2xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 overflow-hidden shadow-sm flex flex-col">
             <div className="px-5 py-4 sm:px-6 border-b border-slate-200 dark:border-slate-600 shrink-0">
               <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-                Parcelas por mês
+                Compras por mês (cartão de crédito)
               </h2>
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                 Verde = pago · Amarelo = pendente. Valores no topo indicam o
-                total a pagar naquele mês.
+                total de compras no cartão naquele mês (parceladas ou não,
+                incluindo recorrentes).
               </p>
             </div>
             <div className="overflow-x-auto overflow-y-auto flex-1 min-h-0">
