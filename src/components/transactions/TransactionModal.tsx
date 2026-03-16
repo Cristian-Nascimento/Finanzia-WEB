@@ -185,6 +185,12 @@ export function TransactionModal() {
         !PAYMENT_AS_CATEGORY_NAMES.includes(cat.name),
     ) ?? []
 
+  const currentCategoryName =
+    categories?.find((c) => c._id === currentCategoryId)?.name ?? ''
+  const isCardPurchaseContext =
+    (paymentMethod === 'credit' || paymentMethod === 'debit') &&
+    currentCategoryName === 'Compras'
+
   if (!isTransactionModalOpen) return null
 
   return (
@@ -213,11 +219,15 @@ export function TransactionModal() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 text-xs">
           <div>
             <label className="block text-[11px] mb-1 text-slate-600 dark:text-slate-300">
-              Título
+              {isCardPurchaseContext ? 'Onde foi a compra (plataforma)' : 'Título / descrição'}
             </label>
             <input
               className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 px-2.5 py-1.5 text-[11px] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/30 dark:focus:bg-slate-600"
-              placeholder="Ex.: Salário, Aluguel, Mercado..."
+              placeholder={
+                isCardPurchaseContext
+                  ? 'Ex.: Mercado Livre, Shopee, Supermercado...'
+                  : 'Ex.: Salário, Aluguel, Mercado...'
+              }
               {...register('title')}
             />
             {errors.title && (
