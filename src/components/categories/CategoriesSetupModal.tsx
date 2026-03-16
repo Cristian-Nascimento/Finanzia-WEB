@@ -17,6 +17,7 @@ const DEFAULT_CATEGORIES: { name: string; type: 'income' | 'expense' }[] = [
   { name: 'Compras', type: 'expense' },
   { name: 'Assinatura', type: 'expense' },
   { name: 'Financiamento', type: 'expense' },
+  { name: 'Consórcio', type: 'expense' },
   { name: 'Multas', type: 'expense' },
   { name: 'Seguros', type: 'expense' },
   { name: 'Outros (despesa)', type: 'expense' },
