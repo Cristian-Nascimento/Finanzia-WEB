@@ -145,7 +145,7 @@ export function CreditCardPage() {
     },
   });
 
-  /** Filtra por período: quando não é "Todos", apenas compras cuja data está no mês/ano selecionado. */
+  /** Lista para a tabela da esquerda: respeita período + filtro de cartão. */
   const periodFilteredPurchases = useMemo(() => {
     if (!purchases.length) return [];
     if (period.showAll) return purchases;
@@ -166,6 +166,16 @@ export function CreditCardPage() {
     return periodFilteredPurchases.filter((p) => p.cardId === cardFilter);
   }, [periodFilteredPurchases, cardFilter]);
 
+  /** Lista para o grid "Compras por mês": ignora período, mas respeita filtro de cartão. */
+  const purchasesForGrid = useMemo(() => {
+    if (!purchases.length) return [];
+    if (!cardFilter) return purchases;
+    if (cardFilter === "__no_card__") {
+      return purchases.filter((p) => !p.cardId);
+    }
+    return purchases.filter((p) => p.cardId === cardFilter);
+  }, [purchases, cardFilter]);
+
   const deleteMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/credit-card/${id}`),
     onSuccess: () => {
@@ -178,8 +188,8 @@ export function CreditCardPage() {
   });
 
   const monthsToDisplay = useMemo(
-    () => getMonthsToDisplay(filteredPurchases),
-    [filteredPurchases],
+    () => getMonthsToDisplay(purchasesForGrid),
+    [purchasesForGrid],
   );
 
   /** Total a pagar por mês: sempre calculado para cada mês exibido em "Parcelas por mês". */
@@ -188,7 +198,7 @@ export function CreditCardPage() {
     monthsToDisplay.forEach((month) => {
       const key = monthKeyToString(month);
       let total = 0;
-      filteredPurchases.forEach((p) => {
+      purchasesForGrid.forEach((p) => {
         const months = getInstallmentMonths(
           p.date,
           p.totalInstallments,
@@ -205,9 +215,9 @@ export function CreditCardPage() {
       map.set(key, total);
     });
     return map;
-  }, [filteredPurchases, monthsToDisplay]);
+  }, [purchasesForGrid, monthsToDisplay]);
 
-  const sortedPurchases = useMemo(() => {
+  const sortedPurchasesList = useMemo(() => {
     const base = [...filteredPurchases];
     base.sort((a, b) => {
       const totalA = getTotalValue(a);
@@ -237,6 +247,37 @@ export function CreditCardPage() {
     });
     return base;
   }, [filteredPurchases, sort]);
+
+  const sortedPurchasesGrid = useMemo(() => {
+    const base = [...purchasesForGrid];
+    base.sort((a, b) => {
+      const totalA = getTotalValue(a);
+      const totalB = getTotalValue(b);
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      switch (sort) {
+        case "date-asc":
+          return dateA - dateB;
+        case "date-desc":
+          return dateB - dateA;
+        case "platform-asc":
+          return a.platform.localeCompare(b.platform, "pt-BR", {
+            sensitivity: "base",
+          });
+        case "platform-desc":
+          return b.platform.localeCompare(a.platform, "pt-BR", {
+            sensitivity: "base",
+          });
+        case "total-asc":
+          return totalA - totalB;
+        case "total-desc":
+          return totalB - totalA;
+        default:
+          return 0;
+      }
+    });
+    return base;
+  }, [purchasesForGrid, sort]);
 
   return (
     <div className="space-y-10 pb-4">
@@ -384,7 +425,7 @@ export function CreditCardPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedPurchases.map((p) => {
+                  {sortedPurchasesList.map((p) => {
                     const isInstallment = p.totalInstallments > 1;
                     return (
                       <tr
@@ -490,7 +531,7 @@ export function CreditCardPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedPurchases.map((p) => (
+                  {sortedPurchasesGrid.map((p) => (
                     <tr
                       key={p._id}
                       className="border-b border-slate-100 dark:border-slate-600/50 hover:bg-slate-50/30 dark:hover:bg-slate-700/10"
