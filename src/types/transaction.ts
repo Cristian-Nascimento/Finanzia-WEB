@@ -2,6 +2,8 @@ export type Transaction = {
   _id: string
   title: string
   description?: string
+  /** Onde foi a compra (plataforma) para cartão. */
+  platform?: string
   amount: number
   type: 'income' | 'expense'
   categoryId?: string

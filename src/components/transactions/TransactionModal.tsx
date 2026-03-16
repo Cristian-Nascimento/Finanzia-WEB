@@ -19,6 +19,7 @@ const schema = z.object({
   date: z.string().min(1, 'Informe a data'),
   isRecurring: z.boolean().optional(),
   notes: z.string().optional(),
+  platform: z.string().optional(),
   installmentCurrent: z
     .union([z.number().int().min(1).max(120), z.nan(), z.literal(0), z.undefined()])
     .transform((v) => (v === undefined || Number.isNaN(v) || v === 0 ? undefined : v))
@@ -217,23 +218,33 @@ export function TransactionModal() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 text-xs">
-          <div>
-            <label className="block text-[11px] mb-1 text-slate-600 dark:text-slate-300">
-              {isCardPurchaseContext ? 'Onde foi a compra (plataforma)' : 'Título / descrição'}
-            </label>
-            <input
-              className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 px-2.5 py-1.5 text-[11px] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/30 dark:focus:bg-slate-600"
-              placeholder={
-                isCardPurchaseContext
-                  ? 'Ex.: Mercado Livre, Shopee, Supermercado...'
-                  : 'Ex.: Salário, Aluguel, Mercado...'
-              }
-              {...register('title')}
-            />
-            {errors.title && (
-              <p className="mt-0.5 text-[11px] text-rose-500 dark:text-rose-400">
-                {errors.title.message}
-              </p>
+          <div className="grid gap-2 grid-cols-1">
+            <div>
+              <label className="block text-[11px] mb-1 text-slate-600 dark:text-slate-300">
+                Título / descrição
+              </label>
+              <input
+                className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 px-2.5 py-1.5 text-[11px] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/30 dark:focus:bg-slate-600"
+                placeholder="Ex.: Salário, Aluguel, Mercado..."
+                {...register('title')}
+              />
+              {errors.title && (
+                <p className="mt-0.5 text-[11px] text-rose-500 dark:text-rose-400">
+                  {errors.title.message}
+                </p>
+              )}
+            </div>
+            {isCardPurchaseContext && (
+              <div>
+                <label className="block text-[11px] mb-1 text-slate-600 dark:text-slate-300">
+                  Onde foi a compra (plataforma)
+                </label>
+                <input
+                  className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 px-2.5 py-1.5 text-[11px] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/30 dark:focus:bg-slate-600"
+                  placeholder="Ex.: Mercado Livre, Shopee, Supermercado..."
+                  {...register('platform')}
+                />
+              </div>
             )}
           </div>
 
