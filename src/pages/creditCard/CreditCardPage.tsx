@@ -145,15 +145,21 @@ export function CreditCardPage() {
     },
   });
 
-  /** Lista para a tabela da esquerda: respeita período + filtro de cartão. */
+  /** Lista para a tabela da esquerda: respeita período + filtro de cartão.
+   *  Inclui compra se o mês/ano selecionado for um dos meses em que ela aparece (parcelas ou recorrente). */
   const periodFilteredPurchases = useMemo(() => {
     if (!purchases.length) return [];
     if (period.showAll) return purchases;
     return purchases.filter((p) => {
-      const d = new Date(p.date);
-      const y = d.getUTCFullYear();
-      const m = d.getUTCMonth() + 1;
-      return y === period.year && m === period.month;
+      const months = getInstallmentMonths(
+        p.date,
+        p.totalInstallments,
+        p.cardClosingDay ?? new Date(p.date).getUTCDate(),
+        p.closingDayToNextInvoice ?? false,
+      );
+      return months.some(
+        (mm) => mm.year === period.year && mm.month === period.month,
+      );
     });
   }, [purchases, period]);
 
