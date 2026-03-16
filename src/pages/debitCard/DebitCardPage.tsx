@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@services/api";
 import type { Transaction } from "@typings/transaction";
-import type { Category } from "@typings/category";
+import { useCategories } from "@hooks/useCategories";
 import { useUiStore } from "@store/uiStore";
 import { Pencil, Trash2, Plus, Wallet } from "lucide-react";
 import { motion } from "framer-motion";
@@ -60,13 +60,7 @@ export function DebitCardPage() {
     },
   });
 
-  const { data: categories = [] } = useQuery<Category[]>({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const res = await api.get("/categories");
-      return res.data;
-    },
-  });
+  const { data: categories = [] } = useCategories();
 
   const getCategoryName = (categoryId?: string) =>
     categories.find((c) => c._id === categoryId)?.name ?? "Sem categoria";
@@ -103,6 +97,7 @@ export function DebitCardPage() {
       queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard-charts"] });
       queryClient.invalidateQueries({ queryKey: ["grouped-view"] });
+      queryClient.invalidateQueries({ queryKey: ["credit-card"] });
       setDeleteConfirm(null);
     },
   });

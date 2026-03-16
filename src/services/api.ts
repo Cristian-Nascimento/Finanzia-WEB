@@ -3,6 +3,11 @@ import { useAuthStore } from '@store/authStore'
 
 const backendUrl = import.meta.env.REACT_APP_BACKEND_URL ?? ''
 
+/**
+ * Cliente HTTP para a API do backend.
+ * Base URL vem de REACT_APP_BACKEND_URL (build time).
+ * Interceptor adiciona Bearer token do auth store ou localStorage.
+ */
 export const api = axios.create({
   baseURL: backendUrl,
 })

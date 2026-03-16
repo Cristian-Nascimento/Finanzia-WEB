@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@services/api";
 import type { Transaction } from "@typings/transaction";
-import type { Category } from "@typings/category";
+import { useCategories } from "@hooks/useCategories";
 import { useUiStore } from "@store/uiStore";
 import { Pencil, Trash2, ArrowDownRight, ArrowUpRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -52,13 +52,7 @@ export function TransactionsPage() {
     },
   });
 
-  const { data: categories } = useQuery<Category[]>({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const response = await api.get("/categories");
-      return response.data;
-    },
-  });
+  const { data: categories } = useCategories();
 
   const queryClient = useQueryClient();
   const openTransactionModal = useUiStore((s) => s.openTransactionModal);
@@ -72,6 +66,8 @@ export function TransactionsPage() {
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard-charts"] });
+      queryClient.invalidateQueries({ queryKey: ["credit-card"] });
+      queryClient.invalidateQueries({ queryKey: ["grouped-view"] });
     },
   });
 

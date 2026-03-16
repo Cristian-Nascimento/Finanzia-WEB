@@ -19,7 +19,7 @@ import { api } from '@services/api'
 import { useUiStore } from '@store/uiStore'
 import type { DashboardSummary, DashboardCharts } from '@typings/dashboard'
 import type { Transaction } from '@typings/transaction'
-import type { Category } from '@typings/category'
+import { useCategories } from '@hooks/useCategories'
 import { formatDateShort } from '@utils/date'
 
 /** 14 cores distintas para categorias de despesas (gráfico e legenda). */
@@ -69,13 +69,7 @@ export function DashboardPage() {
     },
   })
 
-  const { data: categories } = useQuery<Category[]>({
-    queryKey: ['categories'],
-    queryFn: async () => {
-      const response = await api.get('/categories')
-      return response.data
-    },
-  })
+  const { data: categories } = useCategories()
 
   const monthStart = new Date(Date.UTC(selectedYear, selectedMonth - 1, 1, 0, 0, 0, 0))
   const monthEnd = new Date(Date.UTC(selectedYear, selectedMonth, 0, 23, 59, 59, 999))

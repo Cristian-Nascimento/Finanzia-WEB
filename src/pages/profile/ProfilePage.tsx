@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { api } from '@services/api'
 import { useAuthStore } from '@store/authStore'
+import { categoriesQueryKey } from '@hooks/useCategories'
 import { ConfirmModal } from '@components/ui/ConfirmModal'
 type MeResponse = {
   user: {
@@ -114,7 +115,7 @@ export function ProfilePage() {
     onSuccess: () => {
       setDeleteDataModalOpen(false)
       queryClient.invalidateQueries({ queryKey: ['transactions'] })
-      queryClient.invalidateQueries({ queryKey: ['categories'] })
+      queryClient.invalidateQueries({ queryKey: categoriesQueryKey })
       queryClient.invalidateQueries({ queryKey: ['dashboard-summary'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard-charts'] })
       queryClient.invalidateQueries({ queryKey: ['grouped-view'] })

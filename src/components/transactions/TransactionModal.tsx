@@ -5,8 +5,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '@services/api'
 import { useUiStore } from '@store/uiStore'
+import { useCategories } from '@hooks/useCategories'
 import { formatBRL, parseBRL } from '@utils/currency'
-import type { Category } from '@typings/category'
 import type { CreditCardAccount } from '@typings/creditCard'
 
 const schema = z.object({
@@ -46,13 +46,7 @@ export function TransactionModal() {
 
   const queryClient = useQueryClient()
 
-  const { data: categories } = useQuery<Category[]>({
-    queryKey: ['categories'],
-    queryFn: async () => {
-      const response = await api.get('/categories')
-      return response.data
-    },
-  })
+  const { data: categories } = useCategories()
 
   const { data: cardAccounts = [] } = useQuery<CreditCardAccount[]>({
     queryKey: ['credit-card-accounts'],

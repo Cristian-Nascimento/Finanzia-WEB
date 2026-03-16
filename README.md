@@ -45,6 +45,8 @@ src/
 │   ├── categories/    # CategoriesPage
 │   ├── creditCard/    # CreditCardPage
 │   └── profile/      # ProfilePage
+├── hooks/
+│   └── useCategories.ts  # Hook para listar categorias; exporta categoriesQueryKey para invalidateQueries
 ├── services/
 │   └── api.ts        # Instância Axios + interceptor (Bearer token)
 ├── store/

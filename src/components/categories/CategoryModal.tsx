@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@services/api'
+import { categoriesQueryKey } from '@hooks/useCategories'
 import type { Category } from '@typings/category'
 
 const schema = z.object({
@@ -42,7 +43,7 @@ export function CategoryModal({ open, onClose, categoryToEdit }: CategoryModalPr
   const createMutation = useMutation({
     mutationFn: (data: FormValues) => api.post('/categories', data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] })
+      queryClient.invalidateQueries({ queryKey: categoriesQueryKey })
       onClose()
     },
   })
@@ -51,7 +52,7 @@ export function CategoryModal({ open, onClose, categoryToEdit }: CategoryModalPr
     mutationFn: ({ id, data }: { id: string; data: FormValues }) =>
       api.put(`/categories/${id}`, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] })
+      queryClient.invalidateQueries({ queryKey: categoriesQueryKey })
       onClose()
     },
   })

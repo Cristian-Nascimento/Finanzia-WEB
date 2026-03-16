@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { api } from '@services/api'
+import { categoriesQueryKey } from '@hooks/useCategories'
 
 const DEFAULT_CATEGORIES: { name: string; type: 'income' | 'expense' }[] = [
   { name: 'Lazer', type: 'expense' },
@@ -63,7 +64,7 @@ export function CategoriesSetupModal({ open, onClose, onSuccess }: Props) {
     mutationFn: (categories: { name: string; type: string }[]) =>
       api.post('/categories/bulk', { categories }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] })
+      queryClient.invalidateQueries({ queryKey: categoriesQueryKey })
       queryClient.invalidateQueries({ queryKey: ['dashboard-summary'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard-charts'] })
       queryClient.invalidateQueries({ queryKey: ['grouped-view'] })

@@ -1,7 +1,8 @@
 import { useState, useMemo } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@services/api";
 import type { Category } from "@typings/category";
+import { useCategories, categoriesQueryKey } from "@hooks/useCategories";
 import {
   Pencil,
   Trash2,
@@ -18,18 +19,12 @@ export function CategoriesPage() {
   const [categoryToEdit, setCategoryToEdit] = useState<Category | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<Category | null>(null);
 
-  const { data: categories, isLoading } = useQuery<Category[]>({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const res = await api.get("/categories");
-      return res.data;
-    },
-  });
+  const { data: categories, isLoading } = useCategories();
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/categories/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: categoriesQueryKey });
       setDeleteConfirm(null);
     },
   });
