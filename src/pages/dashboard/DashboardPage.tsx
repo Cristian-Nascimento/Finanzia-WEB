@@ -36,6 +36,20 @@ const COLORS_RECEITAS = [
 ]
 
 const MONTH_LABELS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+const FULL_MONTH_NAMES = [
+  'Janeiro',
+  'Fevereiro',
+  'Março',
+  'Abril',
+  'Maio',
+  'Junho',
+  'Julho',
+  'Agosto',
+  'Setembro',
+  'Outubro',
+  'Novembro',
+  'Dezembro',
+]
 
 const now = new Date()
 const currentMonth = now.getMonth() + 1
@@ -372,7 +386,7 @@ export function DashboardPage() {
             <div>
               <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Fluxo mensal</p>
               <p className="text-[11px] text-slate-400 dark:text-slate-500">
-                Evolução de receitas e despesas nos últimos 6 meses
+                Evolução de receitas e despesas nos últimos 12 meses
               </p>
             </div>
           </div>
@@ -406,6 +420,14 @@ export function DashboardPage() {
                     border: '1px solid #e5e7eb',
                     boxShadow:
                       '0 18px 45px rgba(15,23,42,0.08), 0 0 0 1px rgba(148,163,184,0.15)',
+                  }}
+                  labelStyle={{
+                    color: '#0f172a',
+                    fontWeight: 600,
+                  }}
+                  labelFormatter={(label) => {
+                    const index = MONTH_LABELS.indexOf(String(label))
+                    return index >= 0 ? FULL_MONTH_NAMES[index] : label
                   }}
                 />
                 <Area

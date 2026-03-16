@@ -11,7 +11,7 @@ import {
   MONTH_NAMES,
 } from "@typings/creditCard";
 import { formatDateShort } from "@utils/date";
-import { Pencil, Trash2, Plus, CreditCard } from "lucide-react";
+import { Pencil, Trash2, CreditCard } from "lucide-react";
 import { motion } from "framer-motion";
 import { ConfirmModal } from "@components/ui/ConfirmModal";
 import {
@@ -20,7 +20,6 @@ import {
 } from "@components/ui/PeriodFilter";
 import { CreditCardModal } from "@components/creditCard/CreditCardModal";
 import { CreditCardAccountModal } from "@components/creditCard/CreditCardAccountModal";
-import { ImportCreditCardModal } from "@components/creditCard/ImportCreditCardModal";
 
 type MonthKey = { year: number; month: number };
 type CreditCardSort =
@@ -115,7 +114,6 @@ function getCellStatus(
 export function CreditCardPage() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
-  const [importModalOpen, setImportModalOpen] = useState(false);
   const [purchaseToEdit, setPurchaseToEdit] =
     useState<CreditCardPurchase | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<CreditCardPurchase | null>(
@@ -267,10 +265,6 @@ export function CreditCardPage() {
         purchaseToEdit={purchaseToEdit}
         accounts={cardAccounts}
       />
-      <ImportCreditCardModal
-        open={importModalOpen}
-        onClose={() => setImportModalOpen(false)}
-      />
       <CreditCardAccountModal
         open={cardModalOpen}
         onClose={() => setCardModalOpen(false)}
@@ -282,8 +276,9 @@ export function CreditCardPage() {
             Cartão de crédito
           </h1>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 max-w-xl">
-            Acompanhe compras parceladas. As parcelas aparecem também no
-            Dashboard e em Transações.
+            Acompanhe compras no cartão de crédito — parceladas, à vista e
+            assinaturas. As parcelas aparecem também no Dashboard e em
+            Transações.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -292,24 +287,6 @@ export function CreditCardPage() {
             onChange={setPeriod}
             className="w-full sm:w-auto"
           />
-          <button
-            type="button"
-            onClick={() => setImportModalOpen(true)}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
-          >
-            Importar planilha
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setPurchaseToEdit(null);
-              setModalOpen(true);
-            }}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-indigo-600 dark:bg-indigo-500 px-5 text-sm font-medium text-white hover:bg-indigo-500 dark:hover:bg-indigo-400 shadow-sm min-w-[11rem] transition-colors"
-          >
-            <Plus className="h-4 w-4 shrink-0" />
-            Nova compra
-          </button>
           <button
             type="button"
             onClick={() => setCardModalOpen(true)}
@@ -363,19 +340,13 @@ export function CreditCardPage() {
         >
           <CreditCard className="mx-auto h-14 w-14 text-slate-300 dark:text-slate-500" />
           <h3 className="mt-4 text-base font-medium text-slate-900 dark:text-slate-100">
-            Nenhuma compra parcelada
+            Nenhuma compra no cartão de crédito
           </h3>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-            Clique em &quot;Nova compra&quot; para registrar uma compra no
-            cartão. As parcelas também aparecerão no Dashboard e em Transações.
+            Clique em &quot;Nova compra&quot; na tela de Dashboard para
+            registrar uma compra no cartão. As parcelas também aparecerão no
+            Dashboard e em Transações.
           </p>
-          <button
-            type="button"
-            onClick={() => setModalOpen(true)}
-            className="mt-6 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 min-w-[11rem] transition-colors"
-          >
-            Nova compra
-          </button>
         </motion.div>
       ) : (
         <div className="flex flex-col lg:flex-row gap-6 items-stretch">
@@ -383,10 +354,11 @@ export function CreditCardPage() {
           <div className="min-w-0 lg:w-[420px] xl:w-[700px] shrink-0 rounded-2xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 overflow-hidden shadow-sm">
             <div className="px-5 py-4 sm:px-6 border-b border-slate-200 dark:border-slate-600">
               <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-                Compras parceladas
+                Compras no cartão
               </h2>
               <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-                Lista de compras no cartão com valor total e parcelas pagas.
+                Lista de compras no cartão com valor total e, quando
+                parceladas, suas parcelas pagas.
               </p>
             </div>
             <div className="overflow-x-auto">
@@ -412,59 +384,65 @@ export function CreditCardPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedPurchases.map((p) => (
-                    <tr
-                      key={p._id}
-                      className="border-b border-slate-100 dark:border-slate-600/50 hover:bg-slate-50/50 dark:hover:bg-slate-700/20 transition-colors"
-                    >
-                      <td className="py-4 px-5 text-slate-600 dark:text-slate-300">
-                        {formatDateShort(p.date)}
-                      </td>
-                      <td className="py-4 px-5 font-medium text-slate-900 dark:text-slate-100">
-                        {p.platform}
-                      </td>
-                      <td className="py-4 px-5 text-right text-slate-700 dark:text-slate-300">
-                        R${" "}
-                        {p.installmentValue.toLocaleString("pt-BR", {
-                          minimumFractionDigits: 2,
-                        })}
-                      </td>
-                      <td className="py-4 px-5 text-right font-medium text-slate-900 dark:text-slate-100">
-                        R${" "}
-                        {getTotalValue(p).toLocaleString("pt-BR", {
-                          minimumFractionDigits: 2,
-                        })}
-                      </td>
-                      <td className="py-4 px-5 text-center">
-                        <span className="inline-flex items-center rounded-lg bg-slate-100 dark:bg-slate-600/50 px-2.5 py-1 text-xs font-medium text-slate-700 dark:text-slate-200">
-                          {p.paidInstallments}/{p.totalInstallments}
-                        </span>
-                      </td>
-                      <td className="py-4 px-3">
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setPurchaseToEdit(p);
-                              setModalOpen(true);
-                            }}
-                            className="rounded-lg p-2 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
-                            aria-label="Editar"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setDeleteConfirm(p)}
-                            className="rounded-lg p-2 text-slate-500 hover:bg-rose-100 dark:hover:bg-rose-900/40 hover:text-rose-600 transition-colors"
-                            aria-label="Excluir"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {sortedPurchases.map((p) => {
+                    const isInstallment = p.totalInstallments > 1;
+                    return (
+                      <tr
+                        key={p._id}
+                        className="border-b border-slate-100 dark:border-slate-600/50 hover:bg-slate-50/50 dark:hover:bg-slate-700/20 transition-colors"
+                      >
+                        <td className="py-4 px-5 text-slate-600 dark:text-slate-300">
+                          {formatDateShort(p.date)}
+                        </td>
+                        <td className="py-4 px-5 font-medium text-slate-900 dark:text-slate-100">
+                          {p.platform}
+                        </td>
+                        <td className="py-4 px-5 text-right text-slate-700 dark:text-slate-300">
+                          {isInstallment
+                            ? `R$ ${p.installmentValue.toLocaleString("pt-BR", {
+                                minimumFractionDigits: 2,
+                              })}`
+                            : ""}
+                        </td>
+                        <td className="py-4 px-5 text-right font-medium text-slate-900 dark:text-slate-100">
+                          R{"$ "}
+                          {getTotalValue(p).toLocaleString("pt-BR", {
+                            minimumFractionDigits: 2,
+                          })}
+                        </td>
+                        <td className="py-4 px-5 text-center">
+                          {isInstallment && (
+                            <span className="inline-flex items-center rounded-lg bg-slate-100 dark:bg-slate-600/50 px-2.5 py-1 text-xs font-medium text-slate-700 dark:text-slate-200">
+                              {p.paidInstallments}/{p.totalInstallments}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-4 px-3">
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setPurchaseToEdit(p);
+                                setModalOpen(true);
+                              }}
+                              className="rounded-lg p-2 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+                              aria-label="Editar"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setDeleteConfirm(p)}
+                              className="rounded-lg p-2 text-slate-500 hover:bg-rose-100 dark:hover:bg-rose-900/40 hover:text-rose-600 transition-colors"
+                              aria-label="Excluir"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -523,7 +501,7 @@ export function CreditCardPage() {
                           {p.installmentValue.toLocaleString("pt-BR", {
                             minimumFractionDigits: 2,
                           })}
-                          /parcela
+                          {p.totalInstallments > 1 ? "/parcela" : ""}
                         </span>
                       </td>
                       {monthsToDisplay.map((month) => {

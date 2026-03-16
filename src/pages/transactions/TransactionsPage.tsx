@@ -239,13 +239,6 @@ export function TransactionsPage() {
               <option value="amount-asc">Valor (menor primeiro)</option>
             </select>
           </div>
-          <button
-            type="button"
-            onClick={() => openTransactionModal("create", null)}
-            className="inline-flex h-10 items-center justify-center rounded-xl bg-indigo-600 dark:bg-indigo-500 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-500 dark:hover:bg-indigo-400 transition-colors min-w-[11rem]"
-          >
-            Nova transação
-          </button>
         </div>
       </div>
 
@@ -410,16 +403,9 @@ export function TransactionsPage() {
               Nenhuma transação ainda
             </p>
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-              Clique em "Nova transação" para registrar sua primeira
-              movimentação.
+              Use o botão &quot;Nova transação&quot; no topo do Dashboard para
+              registrar sua primeira movimentação.
             </p>
-            <button
-              type="button"
-              onClick={() => openTransactionModal("create", null)}
-              className="mt-4 inline-flex h-9 items-center justify-center rounded-xl bg-indigo-600 px-4 text-xs font-medium text-white hover:bg-indigo-500 min-w-[11rem]"
-            >
-              Nova transação
-            </button>
           </div>
         ) : (
           <ul className="divide-y divide-slate-100 dark:divide-slate-700/70">

@@ -30,7 +30,7 @@
 src/
 ├── components/       # Componentes reutilizáveis
 │   ├── auth/         # ProtectedRoute
-│   ├── creditCard/   # CreditCardModal, CreditCardAccountModal, ImportCreditCardModal
+│   ├── creditCard/   # CreditCardModal, CreditCardAccountModal
 │   ├── investments/  # InvestmentModal
 │   ├── transactions/ # TransactionModal
 │   └── ui/           # PeriodFilter, ConfirmModal, ThemeToggle

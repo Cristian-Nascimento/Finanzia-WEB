@@ -139,16 +139,6 @@ export function DebitCardPage() {
             onChange={setPeriod}
             className="w-full sm:w-auto"
           />
-          <button
-            type="button"
-            onClick={() =>
-              openTransactionModal("create", null, "expense", "debit")
-            }
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-indigo-600 dark:bg-indigo-500 px-5 text-sm font-medium text-white hover:bg-indigo-500 dark:hover:bg-indigo-400 shadow-sm min-w-[11rem] transition-colors"
-          >
-            <Plus className="h-4 w-4 shrink-0" />
-            Nova compra
-          </button>
           <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
             <span className="hidden sm:inline">Ordenar:</span>
             <select
@@ -182,18 +172,9 @@ export function DebitCardPage() {
             Nenhuma compra no débito
           </h3>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-            Clique em &quot;Nova compra&quot; para registrar um gasto pago com
-            cartão de débito.
+            Use o botão &quot;Nova transação&quot; no topo do Dashboard para
+            registrar um gasto pago com cartão de débito.
           </p>
-          <button
-            type="button"
-            onClick={() =>
-              openTransactionModal("create", null, "expense", "debit")
-            }
-            className="mt-6 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 min-w-[11rem] transition-colors"
-          >
-            Nova compra
-          </button>
         </motion.div>
       ) : (
         <div className="rounded-2xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 overflow-hidden shadow-sm">
