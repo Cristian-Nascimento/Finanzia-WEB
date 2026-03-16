@@ -4,7 +4,7 @@ import { api } from "@services/api";
 import type { Transaction } from "@typings/transaction";
 import { useCategories } from "@hooks/useCategories";
 import { useUiStore } from "@store/uiStore";
-import { Pencil, Trash2, Plus, Wallet } from "lucide-react";
+import { Pencil, Trash2, Wallet } from "lucide-react";
 import { motion } from "framer-motion";
 import { ConfirmModal } from "@components/ui/ConfirmModal";
 import {
