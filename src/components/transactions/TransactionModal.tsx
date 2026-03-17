@@ -388,31 +388,18 @@ export function TransactionModal() {
                 Compra parcelada (opcional)
               </p>
               <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                Para despesas no cartão: informe em qual parcela está (ex.: 2 de 6).
+                Para despesas no cartão: informe o total de parcelas (ex.: 6). As parcelas serão distribuídas por mês conforme a data da compra.
               </p>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-[10px] mb-0.5 text-slate-500 dark:text-slate-400">Parcela atual</label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={120}
-                    placeholder="Ex.: 2"
-                    className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-2.5 py-1.5 text-[11px] text-slate-900 dark:text-slate-100"
-                    {...register('installmentCurrent', { valueAsNumber: true, setValueAs: (v) => (v === 0 || Number.isNaN(v) ? undefined : v) })}
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] mb-0.5 text-slate-500 dark:text-slate-400">Total de parcelas</label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={120}
-                    placeholder="Ex.: 6"
-                    className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-2.5 py-1.5 text-[11px] text-slate-900 dark:text-slate-100"
-                    {...register('installmentTotal', { valueAsNumber: true, setValueAs: (v) => (v === 0 || Number.isNaN(v) ? undefined : v) })}
-                  />
-                </div>
+              <div>
+                <label className="block text-[10px] mb-0.5 text-slate-500 dark:text-slate-400">Total de parcelas</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={120}
+                  placeholder="Ex.: 6"
+                  className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-2.5 py-1.5 text-[11px] text-slate-900 dark:text-slate-100"
+                  {...register('installmentTotal', { valueAsNumber: true, setValueAs: (v) => (v === 0 || Number.isNaN(v) ? undefined : v) })}
+                />
               </div>
             </div>
           )}

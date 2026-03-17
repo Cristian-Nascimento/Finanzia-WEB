@@ -425,7 +425,7 @@ export function CreditCardPage() {
                       Valor total
                     </th>
                     <th className="text-center py-4 px-5 font-medium text-slate-700 dark:text-slate-300">
-                      Parcelas
+                      Total de parcelas
                     </th>
                     <th className="w-24 py-4 px-3" aria-label="Ações" />
                   </tr>
@@ -460,7 +460,7 @@ export function CreditCardPage() {
                         <td className="py-4 px-5 text-center">
                           {isInstallment && (
                             <span className="inline-flex items-center rounded-lg bg-slate-100 dark:bg-slate-600/50 px-2.5 py-1 text-xs font-medium text-slate-700 dark:text-slate-200">
-                              {p.paidInstallments}/{p.totalInstallments}
+                              {p.totalInstallments}
                             </span>
                           )}
                         </td>
@@ -545,7 +545,7 @@ export function CreditCardPage() {
                       <td className="sticky left-0 z-10 py-3 px-2 font-medium text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-600">
                         <span className="block">{p.platform}</span>
                         <span className="block text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
-                          {p.paidInstallments}/{p.totalInstallments} · R${" "}
+                          {p.totalInstallments}{p.totalInstallments > 1 ? " parcelas" : " parcela"} · R${" "}
                           {p.installmentValue.toLocaleString("pt-BR", {
                             minimumFractionDigits: 2,
                           })}
